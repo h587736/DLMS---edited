@@ -55,6 +55,16 @@ DLMS_COLOR_Lengendary		= "|cFFff8000"
 DLMS_COLOR_Disable			= "|cFF555555"
 DLMS_COLOR_Enable			= "|cFF00ff00"
 
+-- Define the backdrop table
+local backdrop = {
+    bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+    tile = true,
+    tileSize = 16,
+    edgeSize = 16,
+    insets = { left = 3, right = 3, top = 5, bottom = 3 }
+}
+
 local function DLMS_COLOR(s,c)
 	s = s.."|r"
 	if(_G["DLMS_COLOR_"..c]) then
@@ -392,16 +402,6 @@ listframe:SetPoint("TOPLEFT", 25, -25)
 listframe:EnableMouse(true)
 listframe:EnableMouseWheel(true)
 listframe:SetMovable(true)
-
--- Define the backdrop table
-local backdrop = {
-    bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-    tile = true,
-    tileSize = 16,
-    edgeSize = 16,
-    insets = { left = 3, right = 3, top = 5, bottom = 3 }
-}
 
 -- Apply the backdrop to listframe
 listframe:SetBackdrop(backdrop)
@@ -1025,7 +1025,7 @@ local function MakeCheckBox(name,parent,txt,p,x,y,tooltip)
 end
 
 -- Make our static labels... 
-local function Generate_Static_Labels(parent)
+local function Generate_Static_Labels(parent, backdrop)
     local tmp = Static_Panel_Table
     for k in pairs(tmp) do
         local f = CreateFrame("Frame", tmp[k].Name.."_Panel", parent, "BackdropTemplate")
@@ -1042,7 +1042,7 @@ local function Generate_Static_Labels(parent)
 end
 
 -- Make our static panels...
-local function Generate_Static_Panels(parent)
+local function Generate_Static_Panels(parent, backdrop)
 	local tmp = Static_Panel_Table
 	for k in pairs(tmp) do
 		local f = CreateFrame("Frame", tmp[k].Name.."_Panel", parent)
@@ -1331,8 +1331,8 @@ end
 -- Build our options --
 local function DLMSBuildOptions()
 		
-	Generate_Static_Labels(DLMS_Options)
-	Generate_Static_Panels(DLMS_Options)
+	Generate_Static_Labels(DLMS_Options, backdrop)
+	Generate_Static_Panels(DLMS_Options, backdrop)
 	Generate_Static_Checkboxes()
 	
 	CreatePanelDivider(LBC_Panel, "LBC_Divider1", "TOPLEFT", 10, -32, 582, 4)
