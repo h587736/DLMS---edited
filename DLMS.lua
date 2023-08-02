@@ -1,15 +1,17 @@
 ----------------------------------------------------------
--- Dynamic Loot Management System (DLMS)			--
---	A Loot AddOn for World of Warcraft					--
---														--			
--- 	Written by Auz @ Eitrigg        					--
--- 	Email: auz.addons@gmail.com							--
---     													--
--- WowInterface.com Portal:             				--
+-- Dynamic Loot Management System (DLMS)		--
+--	A Loot AddOn for World of Warcraft		--
+--							--			
+-- 	Written by Auz @ Eitrigg        		--
+-- 	Email: auz.addons@gmail.com			--
+--							--
+--	Edited by bad-fred				--
+--     							--
+-- WowInterface.com Portal:             		--
 --   http://www.wowinterface.com/portal.php?&uid=315562 --
 ----------------------------------------------------------
 
-DLMS_VERSION = GetAddOnMetadata("DLMS", "Version") --"v2.1.3"
+DLMS_VERSION = GetAddOnMetadata("DLMS", "Version") --"v2.1.3.1"
 
 ----------------------
 -- Saved Variables 	-- 
@@ -56,7 +58,7 @@ DLMS_COLOR_Disable			= "|cFF555555"
 DLMS_COLOR_Enable			= "|cFF00ff00"
 
 -- Define the backdrop table
-local backdrop = {
+backdrop = {
     bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
     edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
     tile = true,
@@ -64,6 +66,7 @@ local backdrop = {
     edgeSize = 16,
     insets = { left = 3, right = 3, top = 5, bottom = 3 }
 }
+
 
 local function DLMS_COLOR(s,c)
 	s = s.."|r"
@@ -83,7 +86,14 @@ local DLMS_MONEY_MSG_1 	= DLMS_HEADER..DLMS_COLOR("Picked up: ",2)
 local DLMS_MONEY_MSG_2 	= DLMS_HEADER..DLMS_COLOR("Received your share: ",2)
 local DLMS_LOOT_MSG 	= DLMS_HEADER..DLMS_COLOR("Looted: ",2)
 
-local DLMS_CreateFrame = CreateFrame
+local function DLMS_CreateFrame(frameType, frameName, parentFrame, inheritsFrame)
+    local frame = CreateFrame(frameType, frameName, parentFrame, inheritsFrame)
+    if inheritsFrame == "BackdropTemplate" then
+        frame:SetBackdrop(backdrop)
+    end
+    return frame
+end
+
 local CreateFontString = CreateFontString
 local next,print,tinsert,tremove,gsub,strsub,strsplit = next,print,tinsert,tremove,gsub,strsub,strsplit
 
@@ -1006,14 +1016,15 @@ local function CreateLabel(parent,name,tS,r,b,g,a,p,x,y,txt)
 	fs:Show()
 end
 
-local function CreatePanelDivider(parent,name,p,x,y,w,h)
-	local f = DLMS_CreateFrame("Frame", name, parent)
-	f:SetPoint(p,x,y)
-	f:SetSize(w,h)
-	f:SetAlpha(0.3)
-	f:SetBackdrop(divider)
-	f:Show()
+local function CreatePanelDivider(parent, name, point, x, y, width, height)
+    local divider = DLMS_CreateFrame("Frame", name, parent, "BackdropTemplate")  -- Add "BackdropTemplate" argument here
+    divider:SetPoint(point, x, y)
+    divider:SetWidth(width)
+    divider:SetHeight(height)
+    divider:SetBackdrop(backdrop)  -- Use the global 'backdrop' variable to set the backdrop
+    divider:Show()
 end
+
 
 -- General Checkbox factory...
 local function MakeCheckBox(name,parent,txt,p,x,y,tooltip)
@@ -1042,18 +1053,18 @@ local function Generate_Static_Labels(parent, backdrop)
 end
 
 -- Make our static panels...
-local function Generate_Static_Panels(parent, backdrop)
-	local tmp = Static_Panel_Table
-	for k in pairs(tmp) do
-		local f = CreateFrame("Frame", tmp[k].Name.."_Panel", parent)
-		f:SetPoint(tmp[k].Point, tmp[k].x, tmp[k].y)
-		f:SetWidth(tmp[k].w)
-		f:SetHeight(tmp[k].h)
-		f:SetBackdrop(backdrop)
-		f:Show()
-	end
-	tmp = nil
+local function Generate_Static_Panels(parent)
+    local tmp = Static_Panel_Table
+    for k in pairs(tmp) do
+        local f = DLMS_CreateFrame("Frame", tmp[k].Name.."_Panel", parent, "BackdropTemplate")  -- Add "BackdropTemplate" argument here
+        f:SetPoint(tmp[k].Point, tmp[k].x, tmp[k].y)
+        f:SetWidth(tmp[k].w)
+        f:SetHeight(tmp[k].h)
+        f:Show()
+    end
+    tmp = nil
 end
+
 
 
 
@@ -1336,7 +1347,8 @@ local function DLMSBuildOptions()
 	Generate_Static_Checkboxes()
 	
 	CreatePanelDivider(LBC_Panel, "LBC_Divider1", "TOPLEFT", 10, -32, 582, 4)
-	CreatePanelDivider(LBC_Panel, "LBC_Divider2", "BOTTOMLEFT", 10, 32, 582, 4)
+CreatePanelDivider(LBC_Panel, "LBC_Divider2", "BOTTOMLEFT", 10, 32, 582, 4)
+
 			
 -- Making our Select and Deselect All buttons do what we want --
 	select_all_button:SetParent(LBC_Panel)
